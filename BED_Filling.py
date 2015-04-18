@@ -1,9 +1,32 @@
 # Cody Hanks
 # 4/18/2015 
-# Filing this section handles file rotation and file write settings 
+# Filling this section handles file rotation and file write settings 
+import datetime
+import time
 
-class Filing:
-
-	def __init__(self,mode):
-		pass
+class Filling:
+	
+	# setup filing object,  get current name (note will be updated later) 
+	def __init__(self,site_name,mode):
+		self.site_name = site_name
+		self.currentfilename = self.getnewfilename()
+		
+	#get the current file name 
+	def getcurrentfilename(self):
+		return self.currentfilename
+	
+	# generate new file name (note not unique file may already exist) 
+	def getnewfilename(self):
+		now = datetime.datetime.now()
+		y = now.year
+		m = now.month
+		d = now.day
+		h = now.hour
+		if (h >= 12) :
+			pm = 1
+		else: 
+			pm = 0
+		return ("%i%i%i%i_%s.txt" % (y,m,d,pm,self.site_name))
+		#print ("%i %i %i %i" % (y,m,d,h))
+		#print now
 
