@@ -19,12 +19,22 @@ class server():
 		self.HANDLERS={}
 		self.Server = threading.Thread(target=self.bed_server_loop,name="Server")
 		self.Server.daemon = True
+		# setup handlers 
+		# ["functionName"] = self.FunctionName
 		self.HANDLERS["GETSAMPLE"] = self.GETSAMPLE
+		self.HANDLERS["GETROUND"] = self.GETROUND
 
+
+
+
+
+	# configure ADC for reading 1ADC for 2 IC's 
 	def setADC(self,ADC):
 		self.ADC = ADC
-
-
+	
+	def setSampler(self,Sampler):
+		self.Sampler = Sampler
+	
 
 	#---------------------------------------------------
 	def bed_server_loop(self):
@@ -35,6 +45,7 @@ class server():
 	
 		#loop to listen for next connection
 		while True:	
+			# sockets accept 
 			clisock,(remhost,remport) = sock.accept()
 			rcv_string = clisock.recv(10240)
 			if rcv_string == "":
@@ -48,9 +59,9 @@ class server():
 				request = rcv_list[0]
 			except:
 				#return general 
-				log(GENERAL_ERROR)
+				log(self.GENERAL_ERROR)
 				log("RCV ="+ rcv_string)
-				clisock.sendall(json.dumps(GENERAL_ERROR))
+				clisock.sendall(json.dumps(self.GENERAL_ERROR))
 				clisock.close()
 				continue
 			#try to use handler to further handle the message 
@@ -64,16 +75,47 @@ class server():
 			clisock.close()
 		#end while 
 
-
-
 	def start_serv(self):
 		self.Server.start()
 
 	#---------------------------------------------------------
 
+
+
+
+	# get sample rcv[1] = <channel> 
 	def GETSAMPLE(self,rcv):
-		log(self.ADC.sample(rcv[1]))
-		#log(rcv[1])
-		#log(ADC.sample(rcv[1]))
-		#return ADC.sample(rcv[1]) 
-		return ["ACK"]
+		reading = self.ADC.sample(rcv[1])
+		log(reading)
+		reply = ["ACK"]
+		reply.append(reading[4])
+		# reply [<ACK>,[<upper>,<lower>]]
+		return reply
+	
+
+	# get a full list of samples from RCV[1] 
+	#rcv[1] = [ch,ch...]
+	def GETROUND(self,rcv):
+		reply =["ACK"]
+		self.ADC.continous_setup(rcv[1])
+		for i in range(len(rcv[1])):
+			reply.append(self.ADC.continous_next())
+		return reply
+		# reply [<ACK>,[[ch,<upper>,<lower>],[......]]
+	
+
+
+
+
+
+
+
+
+
+
+
+		
+	
+
+
+

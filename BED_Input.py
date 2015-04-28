@@ -39,6 +39,8 @@ class ADC():
 		self.ic =1
 		self.spi.max_speed_hz = maxSpeed
 		self.spi.mode = mode
+		self.channellist=[]
+		self.channellist_index=0
 		#ADC 7689 config settings 
 		self.CFG =0
 		self.INCC = UNIPOL_GND
@@ -52,26 +54,79 @@ class ADC():
 		upper = 0
 		upper = upper | (self.CFG << 7)
 		upper = upper | (self.INCC <<4)
-		upper = upper | (self.INx <<1)
+		upper = upper | ((self.INx %8) <<1)
 		upper = upper | self.BW
 		lower = 0 
 		lower = lower | ( self.REF <<5)
 		lower = lower | ( self.SEQ <<3)
 		lower = lower | ( self.RB <<2)
 		return [upper,lower]
+	
+	def setic(self):
+		pass
 		
 	def sample(self,channel):
 		log('getting sample ch %i' % channel)
 		rcv =[]
+		if (channel >7):
+			self.ic =2
+		else:
+			self.ic =1	
+		self.setic()
 		self.INx = channel
-		self.CFG = 1
+		self.CFG = 1 # write config word once
 		config = self.cfg()
 		log(config)
 		rcv.append(config)
 		rcv.append(self.spi.xfer2(config))
-		self.CFG = 0 
+		self.CFG = 0 # dont write config word
 		config = self.cfg()
 		rcv.append(config)
 		rcv.append(self.spi.xfer2(config))
 		rcv.append(self.spi.xfer2(config))
 		return rcv
+	
+	def continous_setup(self,channellist):
+		self.channellist = channellist
+		if (len(self.channellist) <2):
+			return ["No Channellist"]
+		self.setic()
+		self.channellist_index =0
+		self.INx = self.channellist[0]
+		self.CFG = 1 # set to write config word
+		log('continous setup configured with ')
+		log(channellist)
+		config = self.cfg()
+		self.spi.xfer2(config)
+		self.channellist_index += 1
+		self.channellist_index = self.channellist_index %(len(self.channellist))
+		self.INx = self.channellist[self.channellist_index]
+		self.setic()
+		self.CFG = 1 # set to write config word
+		config = self.cfg()
+		self.spi.xfer2(config)
+		return [0]
+
+	def continous_next(self):
+		log('continue next called')
+		reply = []
+		self.channellist_index += 1
+		self.channellist_index = self.channellist_index %(len(self.channellist))
+		self.INx = self.channellist[self.channellist_index]
+		log(self.INx)
+		self.setic()
+		self.CFG = 1 # set to write config word 
+		config = self.cfg()
+		log(config)
+		sampleresult= self.channellist_index +(len(self.channellist)-2)
+		sampleresult= sampleresult % len(self.channellist)
+		reply.append(self.channellist[sampleresult])
+		log(sampleresult)
+		sample = self.spi.xfer2(config)
+		log(sample)
+		reply.append(sample[0])
+		reply.append(sample[1])
+		return reply
+	
+		
+		
