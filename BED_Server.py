@@ -19,11 +19,13 @@ class server():
 		self.HANDLERS={}
 		self.Server = threading.Thread(target=self.bed_server_loop,name="Server")
 		self.Server.daemon = True
+		self.write = threading.Thread()
 		# setup handlers 
 		# ["functionName"] = self.FunctionName
 		self.HANDLERS["GETSAMPLE"] = self.GETSAMPLE
 		self.HANDLERS["GETROUND"] = self.GETROUND
-
+		self.HANDLERS["START"]=self.START
+		self.HANDLERS["STOP"]=self.STOP
 
 
 
@@ -104,17 +106,20 @@ class server():
 		# reply [<ACK>,[[ch,<upper>,<lower>],[......]]
 	
 
-
-
-
-
-
-
-
-
-
-
-		
+	#Start sampling the input to the queue 
+	def START(self,rcv):
+		reply =["ACK"]
+		self.Sampler.setchanlist(rcv[1])
+		self.Sampler.start()
+		return reply
+	
+	def STOP(self,rcv):
+		reply =["ACK"]
+		self.Sampler.stop()
+		reply.append(self.Sampler.getqueue())
+		self.write = threading.Thread(target=self.Sampler.writequeue(),name="w")
+		self.write.start()
+		return reply
 	
 
 

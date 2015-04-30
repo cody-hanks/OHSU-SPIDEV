@@ -1,7 +1,7 @@
 # Cody Hanks
 # 4/18/2015 
 # Filling this section handles file rotation and file write settings 
-import GlobalConstants
+import BED_GlobalConstants
 import datetime
 import time
 

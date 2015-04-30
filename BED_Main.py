@@ -5,7 +5,7 @@ import BED_GlobalConstants
 import BED_Filling
 import time
 import BED_Server
-.pfrom BED_GlobalConstants import l_mode
+from BED_GlobalConstants import l_mode
 from xml.dom.minidom import parse
 
 
