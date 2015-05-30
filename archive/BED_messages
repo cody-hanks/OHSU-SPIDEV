@@ -1,0 +1,58 @@
+# cody hanks 
+4/25/2015 
+
+messages sent or recived by the server 
+	["GETSAMPLE",<channel>]
+		reply ["ACK",[<upper_byte>,<lower_byte>]]
+	
+	["GETROUND",<channel_list>]
+		the channel list in Json format [ch,ch,....] they dont need to be in order or consecutive ch = 0:16
+		reply ["ACK",[[<ch>,<upper>,<lower>],...]]
+
+
+BED_Server 
+	Server.__init__(self) 
+	Server.bed_server_loop(self)
+		Main loop for server functionality 
+	Server.setADC(self,ADC)
+	Server.start_serv(self)
+
+BED_Log 
+	log(<string>)
+	TODO Need to add functionality to load to file 
+
+BED_Main
+	While true loop 
+
+BED_Input 
+	ADC.__init__(self) 
+	ADC.CFG(self) 
+		return [<upper>,<lower>] of the configuration word
+	ADC.setic 
+		set the CSN lines by IC bit in ADC
+	ADC.sample(self,channel) 
+		reply [[<config>],[<DC>],[<config>],[<DC>],[<upper>,<lower>]]
+	ADC.continous_setup(self,Channellist)
+		channellist=         [<channel>,....]
+		channel list >2
+	   reply [0] or ["No channel list]
+	ADC.continous_next()
+		reply [<ch>,[<upper>,<lower>]]
+		where ch == from channel list the last value 
+	
+BED_Sampler
+	Sampler.start()
+		starts a sample to the queue 
+			must set chan list and freq first 
+	Sampler.stop() 
+		sets trigger to false
+	Sampler.setfreq(freq)
+		sets the sample frq in Hz 
+	Sampler.setchanlist(chanlist) 
+		sets the channel list [0,1,2,....]
+	Sampler.getqueue
+		returns the length of the queue 
+	Sampler.writequeue
+		#TODO Need to update where the queue goes 
+		writes the current queue to a file 
+	

@@ -17,17 +17,36 @@ class Queue:
 		#Gain write lock 
 		with self.lock:
 			self.in_stack.append(obj)
-	
+			
+		
 	#pop of the FIFO list 
 	def pop(self):
 		with self.lock:
 			if not self.out_stack:
 				self.in_stack.reverse()
-				self.out_stack = self.in_stack
+				self.out_stack = self.in_stack[:]
+				del self.in_stack[0:]
 				self.in_stack =[]
-				if self.mode >= l_mode.debug:
-					log('Transfered %i records from input to output' % len(self.out_stack))
-			return self.out_stack.pop()
+		if self.mode >= l_mode.debug:
+			log('Transfered %i records from input to output' % len(self.out_stack))
+		return self.out_stack.pop()
+
+	def pop2(self):
+		with self.lock:
+			return self.in_stack.pop(0)
+		
+
+	
+	def getoutput(self):
+		 with self.lock:
+                        if not self.out_stack:
+                                self.in_stack.reverse()
+                                self.out_stack = self.in_stack
+                                self.in_stack =[]
+			stack = self.out_stack[:]
+			self.out_stack = []
+			return stack
+	
 	
 	# get total length of all 
 	def length(self):

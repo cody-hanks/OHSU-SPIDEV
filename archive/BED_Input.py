@@ -108,22 +108,22 @@ class ADC():
 		return [0]
 
 	def continous_next(self):
-		log('continue next called')
+		#log('continue next called')
 		reply = []
 		self.channellist_index += 1
 		self.channellist_index = self.channellist_index %(len(self.channellist))
 		self.INx = self.channellist[self.channellist_index]
-		log(self.INx)
+		#log(self.INx)
 		self.setic()
 		self.CFG = 1 # set to write config word 
 		config = self.cfg()
-		log(config)
+		#log(config)
 		sampleresult= self.channellist_index +(len(self.channellist)-2)
 		sampleresult= sampleresult % len(self.channellist)
 		reply.append(self.channellist[sampleresult])
-		log(sampleresult)
+		#log(sampleresult)
 		sample = self.spi.xfer2(config)
-		log(sample)
+		#log(sample)
 		reply.append(sample[0])
 		reply.append(sample[1])
 		return reply

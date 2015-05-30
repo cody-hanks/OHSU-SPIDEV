@@ -5,8 +5,8 @@ import copy
 import sys
 from BED_Log import log
 import BED_Input
-
-
+import BED_Filling
+import BED_Consumer
 
 class server():
 	def __init__(self):
@@ -14,7 +14,7 @@ class server():
 		self.GENERAL_ERROR=["NAK",0]
 		self.INVALID_REQUEST=["NAK",1]
 		self.INVALID_PASSWORD=["NAK",2]
-
+		self.Queue = None
 		#dictionary of handlers 
 		self.HANDLERS={}
 		self.Server = threading.Thread(target=self.bed_server_loop,name="Server")
@@ -37,6 +37,11 @@ class server():
 	def setSampler(self,Sampler):
 		self.Sampler = Sampler
 	
+	def setFiller(self,filer):
+		self.Filler = filer
+	
+	def setQueue(self,queue):
+		self.Queue = queue
 
 	#---------------------------------------------------
 	def bed_server_loop(self):
@@ -70,7 +75,7 @@ class server():
 			try:
 				reply=self.HANDLERS[request](rcv_list)
 			except:
-				log("handler exception notfound "+request)
+				log("handler exception notfound "+ rcv_string)
 				reply=self.INVALID_REQUEST
 			#
 			clisock.sendall(json.dumps(reply))
@@ -109,16 +114,25 @@ class server():
 	#Start sampling the input to the queue 
 	def START(self,rcv):
 		reply =["ACK"]
-		self.Sampler.setchanlist(rcv[1])
+		self.Sampler.setchanlist(rcv[2])
+		self.Sampler.setfreq(rcv[1])
 		self.Sampler.start()
+		#self.Filler.getcurrentfilename()
+		#self.Filler.start()
+		
+		consumer = BED_Consumer.Consumer(self.Queue)
+		consumer.start()
 		return reply
 	
 	def STOP(self,rcv):
 		reply =["ACK"]
 		self.Sampler.stop()
-		reply.append(self.Sampler.getqueue())
-		self.write = threading.Thread(target=self.Sampler.writequeue(),name="w")
-		self.write.start()
+		#reply.append(self.Sampler.getqueue())
+		#self.write = threading.Thread(target=self.Sampler.writequeue(),name="w")
+		#self.write.start()
+		#self.Filler.stop()
+		#self.Filler.flush()
+		self.Queue.put(None)
 		return reply
 	
 
