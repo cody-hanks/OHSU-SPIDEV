@@ -1,0 +1,21 @@
+
+import java.io.*;
+import com.sun.jna.Library;
+import com.sun.jna.Native;
+import com.sun.jna.NativeLibrary;
+
+public class datacollector extends Thread{
+	public interface cspi extends Library{
+		void test();
+	}
+	cspi CSPI;
+	public datacollector()
+	{
+		CSPI = (cspi)Native.loadLibrary("cspi",cspi.class);
+		CSPI.test();
+	}
+	public void run()
+	{
+		
+	}
+}
