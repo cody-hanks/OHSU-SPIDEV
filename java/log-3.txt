@@ -1,0 +1,6 @@
+2015-07-26T03:04:11.374_Started Data collection
+2015-07-26T03:04:11.374_writing to file /home/cody/data/2015JULY26AM
+2015-07-26T03:10:19.613_exiting
+2015-07-26T03:10:19.613_Exited DataCollector
+2015-07-26T03:10:19.615_Server Exit
+2015-07-26T03:10:20.355_Exit DataWriter

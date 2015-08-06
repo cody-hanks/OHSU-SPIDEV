@@ -1,0 +1,14 @@
+2015-07-26T22:27:15.314_starting server
+2015-07-26T22:27:21.756_Connection accepted
+2015-07-26T22:34:48.135_Started Data collection
+2015-07-26T22:34:48.136_writing to file /home/cody/data/2015JULY26PM
+2015-07-26T22:44:48.135_Updated File Name
+2015-07-26T23:55:14.989_exiting
+2015-07-26T23:55:14.990_Exited DataCollector
+2015-07-26T23:55:14.991_Server Exit
+2015-07-26T23:55:15.544_Exit DataWriter
+2015-07-27T00:04:04.328_starting server
+2015-07-27T00:04:12.437_Connection accepted
+2015-07-27T00:04:16.401_Started Data collection
+2015-07-27T00:04:16.402_writing to file /home/cody/data/2015JULY27AM
+2015-07-27T00:14:16.400_Updated File Name

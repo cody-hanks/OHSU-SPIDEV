@@ -1,0 +1,1 @@
+sudo jar cfm out.jar manifest.txt *.class linux-arm/libcspi.so 
