@@ -66,9 +66,26 @@ public class xmlconfig
 			_dat.frequency = Integer.parseInt(frequency);
 			_dat.log("frequency set to: "+_dat.frequency);
 			
+			String siteid= doc.getElementsByTagName("siteid").item(0).getTextContent();
+			_dat.siteid = siteid;
+			_dat.log("SiteID updated: "+siteid);
+			
+			String token =doc.getElementsByTagName("token").item(0).getTextContent();
+			_dat.token =token;
+			_dat.log("Token:"+token);
+			
+			String clientid =doc.getElementsByTagName("clientid").item(0).getTextContent();
+			_dat.clientid =clientid;
+			_dat.log("client id:"+clientid);
+			
+			String secret =doc.getElementsByTagName("secret").item(0).getTextContent();
+			_dat.secret =secret;
+			_dat.log("Secret:"+secret);
 			
 			
-			
+			String parent_folder =doc.getElementsByTagName("parent_folder").item(0).getTextContent();
+			_dat.parent_folder =parent_folder;
+			_dat.log("parentfolder:"+parent_folder);
 			
 		}
 		catch(Exception ex)

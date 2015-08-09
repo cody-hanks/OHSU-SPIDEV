@@ -1,42 +1,57 @@
-package org.embedrf.core.data.upload;
 
+
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
-import org.embedrf.core.Logger;
+import java.util.concurrent.locks.ReentrantLock;
+
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.api.client.http.FileContent;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.Drive.Files;
+import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.Drive.Children;
 import com.google.api.services.drive.model.ChildList;
 import com.google.api.services.drive.model.ChildReference;
 import com.google.api.services.drive.model.FileList;
 import com.google.api.services.drive.model.ParentReference;
 
-public class GoogleDriveUploader_Cody implements IUploadInterface {
+public class GoogleDriveUploader_Cody implements IUploadInterface{
+	
+	Data _dat;
+	ReentrantLock[] _runlocklst;
+	
+	
 
 	private Drive service = null;;
 	// donte need this if sitedata folder is set. private  String parentfolderid = "";  //google drive id of the parent folder for the site data folders.....   "
-	private final static String parentfolderName = "SleepStudy";
+	private static String parentfolderName = "";
 
 	private  String sitefoldername = "";
 	//private  String sitefolderid = "";
 
 	//for now we will hard code the refresh token..
 
-	private static String CLIENT_ID =  "240795554120-i4baqa7giopgfh8imann3ikeal1tcall.apps.googleusercontent.com";
+	private static String CLIENT_ID =  "";
 			//"480665486644-9h2ve9e33131g0fp66nfen85nfcnpnp4.apps.googleusercontent.com";
-	private static String CLIENT_SECRET = "GmVpPttxeVoQFKTbwLw2nCeX";
+	private static String CLIENT_SECRET = "";
 	
-	public static String ACCESS_REFRESH_TOKEN = "4/69TepfkZtmydoXFLbWfoaFN0dONcLz_BGH9zCpZIxz8";
-	
+	public static String ACCESS_REFRESH_TOKEN = "";
+	private static String REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob";
 	
 			//"dn6H0c_JJ-FwgKWCsQQJ8DVD";
 
@@ -60,10 +75,19 @@ public class GoogleDriveUploader_Cody implements IUploadInterface {
 
 	public static final int FILE_FORMAT_VERSION = 2;  //make final.
 
-	public GoogleDriveUploader_Cody(String sitefoldername)
+	public GoogleDriveUploader_Cody(ReentrantLock[] runlocks,Data dat)
 	{
-		this.sitefoldername = sitefoldername;
+		_runlocklst = runlocks;
+		_dat = dat;
+		this.sitefoldername = _dat.siteid;
+		this.parentfolderName = _dat.parent_folder;
+		this.CLIENT_ID = _dat.clientid;
+		this.ACCESS_REFRESH_TOKEN = _dat.token;
+		this.CLIENT_SECRET = _dat.secret;
+		
 		buildDriveService();
+		
+		
 	}
 
 
@@ -71,7 +95,7 @@ public class GoogleDriveUploader_Cody implements IUploadInterface {
 
 	private void buildDriveService()
 	{
-		Logger.appendLogfile("NodeMgr-DriveUploader","Building Google Driver Svc Handle");
+		
 		lastDriveUploaderSvcBuild = Calendar.getInstance();
 
 		HttpTransport httpTransport = new NetHttpTransport();
@@ -82,8 +106,8 @@ public class GoogleDriveUploader_Cody implements IUploadInterface {
 		.setJsonFactory(jsonFactory)
 		.setClientSecrets(CLIENT_ID, CLIENT_SECRET).build();
 
-		credential.setAccessToken(ACCESS_REFRESH_TOKEN);
-		//credential.setRefreshToken(ACCESS_REFRESH_TOKEN);  //this does not expire. ,,we will update this periodically from web service
+		//credential.setAccessToken(ACCESS_REFRESH_TOKEN);
+		credential.setRefreshToken(ACCESS_REFRESH_TOKEN);  //this does not expire. ,,we will update this periodically from web service
 		//Create a new authorized API client
 		service = new Drive.Builder(httpTransport, jsonFactory, credential).setApplicationName("SleepStudy_Odroid").build();
 		if(service != null)
@@ -123,7 +147,32 @@ public class GoogleDriveUploader_Cody implements IUploadInterface {
 		{
 			buildDriveService();
 		}
-
+		
+		//Check file exists
+		boolean found =false;
+		List<com.google.api.services.drive.model.File> filelist = retrieveAllFiles();
+		if(!filelist.isEmpty())
+		{
+			for(com.google.api.services.drive.model.File fn : filelist)
+			{
+				try{
+				String gfileid = getfolderID(subfolder);
+				String pfileid = fn.getParents().get(0).getId();
+				String gfilenm = fn.getTitle();
+				String pfilenm = f.getName();
+				
+				if(gfileid.equals(pfileid) && gfilenm.equals(pfilenm))
+				{
+					found =true;
+				}}
+				catch(Exception ex){}
+			}
+			
+		}//end if empty list 
+		if(!found)
+		{
+		
+		
 
 		String mimetype = "text/plain";
 		if(f.getName().endsWith(".zip"))
@@ -135,7 +184,7 @@ public class GoogleDriveUploader_Cody implements IUploadInterface {
 			mimetype = "text/xml";
 		}
 
-		Logger.appendLogfile("NodeMgr-DriveUploader","Uploading file: " + f.getName());
+		//Logger.appendLogfile("NodeMgr-DriveUploader","Uploading file: " + f.getName());
 		//Insert a file  
 		com.google.api.services.drive.model.File body = new com.google.api.services.drive.model.File();
 
@@ -160,7 +209,7 @@ public class GoogleDriveUploader_Cody implements IUploadInterface {
 
 
 					String c_dailyfolderid = getRemoteFolderID(filedate,site_continious_data_folder_id);
-					Logger.appendLogfile("NodeMgr-DriveUploader","got valid c daily folder id: " + c_dailyfolderid);
+					//Logger.appendLogfile("NodeMgr-DriveUploader","got valid c daily folder id: " + c_dailyfolderid);
 
 					subfolderid = c_dailyfolderid;
 				}	
@@ -170,7 +219,7 @@ public class GoogleDriveUploader_Cody implements IUploadInterface {
 					String filedate = f.getName().substring(start+3, start + 11);
 
 					String script_dailyfolderid = getRemoteFolderID(filedate,site_scripts_data_folder_id);
-					Logger.appendLogfile("NodeMgr-DriveUploader","got valid daily script folder id: " + script_dailyfolderid);	
+					//Logger.appendLogfile("NodeMgr-DriveUploader","got valid daily script folder id: " + script_dailyfolderid);	
 					subfolderid = script_dailyfolderid;
 				}
 			}
@@ -182,7 +231,7 @@ public class GoogleDriveUploader_Cody implements IUploadInterface {
 					//int start = f.getName().indexOf("__");
 
 					String c_dailyfolderid = getRemoteFolderID(filedate,site_continious_data_folder_id);
-					Logger.appendLogfile("NodeMgr-DriveUploader","got valid c daily folder id: " + c_dailyfolderid);
+					//Logger.appendLogfile("NodeMgr-DriveUploader","got valid c daily folder id: " + c_dailyfolderid);
 
 					subfolderid = c_dailyfolderid;
 				}	
@@ -192,7 +241,7 @@ public class GoogleDriveUploader_Cody implements IUploadInterface {
 					//String filedate = f.getName().substring(start+3, start + 11);
 
 					String script_dailyfolderid = getRemoteFolderID(filedate,site_scripts_data_folder_id);
-					Logger.appendLogfile("NodeMgr-DriveUploader","got valid daily script folder id: " + script_dailyfolderid);	
+					//Logger.appendLogfile("NodeMgr-DriveUploader","got valid daily script folder id: " + script_dailyfolderid);	
 					subfolderid = script_dailyfolderid;
 				}
 			}
@@ -214,11 +263,12 @@ public class GoogleDriveUploader_Cody implements IUploadInterface {
 			FileContent mediaContent = new FileContent(mimetype, f);
 			com.google.api.services.drive.model.File file = service.files().insert(body, mediaContent).execute();
 			
-			Logger.appendLogfile("NodeMgr-DriveUploader", "Success -- File ID: " + file.getId());
+			//Logger.appendLogfile("NodeMgr-DriveUploader", "Success -- File ID: " + file.getId());
 		}
 		else
 		{
-			Logger.appendLogfile("NodeMgr-DriveUploader", "Cant upload file, null folder ID");
+			//Logger.appendLogfile("NodeMgr-DriveUploader", "Cant upload file, null folder ID");
+		}
 		}
 	}
 
@@ -728,5 +778,71 @@ public class GoogleDriveUploader_Cody implements IUploadInterface {
 	}
 
 
+	public static void generateNewAccessAndRefreshToken() throws IOException
+	{
+		
+		
+		HttpTransport httpTransport = new NetHttpTransport();
+		JsonFactory jsonFactory = new JacksonFactory();
+
+
+		GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
+				httpTransport, jsonFactory, CLIENT_ID, CLIENT_SECRET, Arrays.asList(DriveScopes.DRIVE))
+		.setAccessType("offline")
+		.setApprovalPrompt("force").build();
+
+			
+	
+		//flow.createAndStoreCredential(response, userId)
+		
+		String url = flow.newAuthorizationUrl().setRedirectUri(REDIRECT_URI).build();
+		
+		
+		
+		System.out.println("Please open the following URL in your browser then type the authorization code:");
+		System.out.println("  " + url);
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		String code = br.readLine();
+
+		
+		GoogleTokenResponse response = flow.newTokenRequest(code).setRedirectUri(REDIRECT_URI).execute();
+		
+		String refreshtok = response.getRefreshToken();
+		System.out.println("refresh tok: " + refreshtok);
+		
+		
+		//GoogleCredential credential = new GoogleCredential().setFromTokenResponse(response);
+
+	}
+
+
+	private List<com.google.api.services.drive.model.File> retrieveAllFiles() throws IOException
+	{
+		Calendar now = Calendar.getInstance();
+		long deltaMin = (now.getTimeInMillis() - lastDriveUploaderSvcBuild.getTimeInMillis())/60000;
+		if(deltaMin > 24*60)  //every 24 hours, rebuild the svc,  to make sure it does nto exprie the cookie..etc 
+		{
+			buildDriveService();
+		}
+		
+		
+		
+		List<com.google.api.services.drive.model.File> result = new ArrayList<com.google.api.services.drive.model.File>();
+		com.google.api.services.drive.Drive.Files.List request = service .files().list().setQ("trashed = false");
+		do{
+		try{
+		com.google.api.services.drive.model.FileList files = request.execute();
+		result.addAll(files.getItems());
+		request.setPageToken(files.getNextPageToken());
+		
+		}catch(Exception e)
+		{
+			_dat.log("error "+e.getMessage());
+		}
+		
+		}while(request.getPageToken() != null && request.getPageToken().length() >0);
+		return result;
+		
+	}//end of list 
 
 }
