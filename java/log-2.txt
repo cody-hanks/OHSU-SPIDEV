@@ -1,8 +1,0 @@
-2015-07-26T02:53:51.848_starting server
-2015-07-26T02:54:00.738_Connection accepted
-2015-07-26T02:54:03.918_Started Data collection
-2015-07-26T02:54:03.918_writing to file /home/cody/data/2015JULY26AM
-2015-07-26T02:54:42.885_exiting
-2015-07-26T02:54:42.885_Exited DataCollector
-2015-07-26T02:54:42.887_Server Exit
-2015-07-26T02:54:43.141_Exit DataWriter
