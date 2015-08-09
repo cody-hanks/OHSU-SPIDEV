@@ -3,21 +3,33 @@
 import java.io.*;
 import java.net.*;
 import java.util.Date;
+import java.util.LinkedList;
 import java.lang.*;
 import java.util.concurrent.locks.*;
 import javax.xml.parsers.*;
 import org.w3c.dom.*;
 
-import com.google.api.services.drive.Drive;
+
 
 
 public class OHSUDEV
 {
 	
-	public static void main(String[] args)
+	public static void main(String[] args) 
 	{
 
+//		
+//		while(fqin.queue.peek() != null)
+//			System.out.println(fqin.next());
+		
+//		/*try {
+//			GoogleDriveUploader_Cody.generateNewAccessAndRefreshToken();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}*/	
 
+		
 		// now setup for arrays and objects 
 		
 		ReentrantLock[] locks = new ReentrantLock[6];
@@ -33,9 +45,38 @@ public class OHSUDEV
 		xmlconfig configparse = new xmlconfig(dat.configfile,dat);
 		configparse.parsexmlconfig();
 			
+		//create a gooogle drive object and copy the folder into it.
+		
+		GoogleDriveUploader_Cody gu = new GoogleDriveUploader_Cody(locks,dat);
+		gu.initilizeFolderIDs();
+		
+		
+		
+		File f = new File(dat.configfile);
+		try {
+			gu.doUpload(f, IUploadInterface.SUBFOLDER.Configs);
+		} catch (IOException e) {
+			dat.log("error uploading config file");
+		}
+		//set dat google uploader 
+		dat.gu = gu;
+		
+		
+		
+		
+		//set dat file queue 
+		//file queue stored to disk for later access 
+		//TODO dont think this is working not sure why its failing other than possibly empty queue
+		dat.fq = new FileQueue(dat.qeuefile);
+		
+		//start thread for uploading 
+		Runnable UploadThread = new RunUploader(locks,dat);
+		new Thread(UploadThread).start();
+		
+		
 		//Starting server 
 		System.out.println("Starting OHSU Sleep server");
-		//dat.lists = new long[2][listlength][chlist];
+		
 		
 		//create the runnable thread objects
 		Runnable ServerThread = new Server(locks,dat);
@@ -49,9 +90,6 @@ public class OHSUDEV
 		//start the server thread
 		new Thread(ServerThread).start();
 		
-		
-		//(new Thread(new Server())).start();//start command server 
-		//(new Thread(new DataCollector())).start();
 	
 		System.out.println("---------------------------------");
 		while(dat.getcont())

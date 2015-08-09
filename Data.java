@@ -30,8 +30,10 @@ public class Data{
 	
 	//lists for data 
 	public static int listlength=16384;
-	public static String fileLocation = "/home/cody/data/";
+	public static String homefolder = "/home/cody";//System.getProperty("user.home");
+	public static String fileLocation = homefolder + "/data/";
 	public static String logfile = fileLocation+"log.txt";
+	public static String qeuefile = fileLocation+"queue.obj";
 	public volatile int[][][] lists;
 	public ReentrantLock[] _locks;
 	public cspi CSPI;
@@ -39,6 +41,7 @@ public class Data{
 	public boolean[] listhasdata;
 	public int[] chList;
 	public int chCount;
+	
 	
 	
 	//server port number 
@@ -53,6 +56,16 @@ public class Data{
 	public String configfile = fileLocation+"config.xml";
 	public boolean autostart = false; //autostart default to no
 	public int frequency = 250;
+	public String siteid = "noid";
+	public String token;
+	public String clientid;
+	public String secret;
+	public String parent_folder;
+	
+	
+	public GoogleDriveUploader_Cody gu;
+	//we have the google uploader start the queue 
+	public FileQueue fq;
 	
 	//constructor
 	public Data(ReentrantLock[] locks)
@@ -66,7 +79,7 @@ public class Data{
 		if(fd <0)
 		{
 			log("Unable to open GPIO");
-			_cont = false;
+			//_cont = false;
 		}
 		listhasdata = new boolean[2];
 		listhasdata[0] = false;

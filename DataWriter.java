@@ -175,7 +175,7 @@ public class DataWriter extends Thread{
 	///return inital file name stored in Datawriter filename
 	private void _getfilename()
 	{
-		filename =""+LocalDateTime.now().getYear()+LocalDateTime.now().getMonth()+LocalDateTime.now().getDayOfMonth();
+		filename =""+LocalDateTime.now().getYear()+LocalDateTime.now().getMonth().getValue()+LocalDateTime.now().getDayOfMonth()+LocalDateTime.now().getHour()+LocalDateTime.now().getMinute();
 		if(LocalDateTime.now().getHour() >12)
 		{filename +="PM";}
 		else 
@@ -184,7 +184,7 @@ public class DataWriter extends Thread{
 	//check for filename changes (will change at hour =1 so 1am and 1pm 
 	public boolean filenamechanged()
 	{
-		String temp = ""+LocalDateTime.now().getYear()+LocalDateTime.now().getMonth()+LocalDateTime.now().getDayOfMonth();
+		String temp = ""+LocalDateTime.now().getYear()+LocalDateTime.now().getMonth().getValue()+LocalDateTime.now().getDayOfMonth()+LocalDateTime.now().getHour()+LocalDateTime.now().getMinute();
 		if(LocalDateTime.now().getHour() >12)
 		{temp +="PM";}
 		else 
@@ -206,6 +206,9 @@ public class DataWriter extends Thread{
 			_dat.log("tried to lock both lists");
 			if(_dat._locks[0].isHeldByCurrentThread() &&_dat._locks[1].isHeldByCurrentThread())
 			{
+				String oldname = filename;
+				_dat.fq.queue.add(_dat.fileLocation+"time"+oldname+".txt");
+				_dat.fq.queue.add(_dat.fileLocation+oldname+".txt");
 				_getfilename();
 				_dat.log("new filename "+filename);
 				_dat.log("released locks");
