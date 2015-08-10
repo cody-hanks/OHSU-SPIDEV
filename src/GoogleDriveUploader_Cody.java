@@ -310,9 +310,11 @@ public class GoogleDriveUploader_Cody implements IUploadInterface{
 		} 
 		catch (Exception ex)
 		{
+			
+			ex.printStackTrace();
 			return false;
 		}
-
+			
 		do
 		{
 			try
@@ -340,7 +342,7 @@ public class GoogleDriveUploader_Cody implements IUploadInterface{
 			}
 			catch (Exception ex)
 			{
-
+				ex.printStackTrace();
 			}
 		}  while (request.getPageToken() != null &&
 				request.getPageToken().length() > 0);
@@ -371,6 +373,7 @@ public class GoogleDriveUploader_Cody implements IUploadInterface{
 			return true;
 		} catch (Exception ex)
 		{
+			ex.printStackTrace();
 			return false;
 		}
 
@@ -399,6 +402,7 @@ public class GoogleDriveUploader_Cody implements IUploadInterface{
 		} 
 		catch (Exception ex)
 		{
+			ex.printStackTrace();
 			return false;
 		}
 
@@ -415,7 +419,7 @@ public class GoogleDriveUploader_Cody implements IUploadInterface{
 			}
 			catch (Exception ex)
 			{
-
+				ex.printStackTrace();
 			}
 		}  while (request.getPageToken() != null &&
 				request.getPageToken().length() > 0);
@@ -443,7 +447,7 @@ public class GoogleDriveUploader_Cody implements IUploadInterface{
 		}
 		catch (Exception ex)
 		{
-
+			ex.printStackTrace();
 		}
 		return false;
 	}
@@ -483,7 +487,7 @@ public class GoogleDriveUploader_Cody implements IUploadInterface{
 			}
 			catch (Exception ex)
 			{
-
+					ex.printStackTrace();
 			}
 		}  while (request.getPageToken() != null &&
 				request.getPageToken().length() > 0);
@@ -838,6 +842,7 @@ public class GoogleDriveUploader_Cody implements IUploadInterface{
 		}catch(Exception e)
 		{
 			_dat.log("error "+e.getMessage());
+			e.printStackTrace();
 		}
 		
 		}while(request.getPageToken() != null && request.getPageToken().length() >0);

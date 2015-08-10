@@ -30,7 +30,7 @@ public class Data{
 	
 	//lists for data 
 	public static int listlength=16384;
-	public static String homefolder = "/home/ohsu";//System.getProperty("user.home");
+	public static String homefolder = "/home/ohsu";
 	public static String fileLocation = homefolder + "/data/";
 	public static String logfile = fileLocation+"log.txt";
 	public static String qeuefile = fileLocation+"queue.obj";
@@ -79,7 +79,7 @@ public class Data{
 		if(fd <0)
 		{
 			log("Unable to open GPIO");
-			_cont = false;
+			//_cont = false;
 		}
 		listhasdata = new boolean[2];
 		listhasdata[0] = false;
@@ -156,7 +156,7 @@ public class Data{
 		catch(Exception ex)
 		{
 			System.out.println("Log Writer exception");
-			
+			ex.printStackTrace();
 		}
 	}
 	

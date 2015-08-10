@@ -48,7 +48,7 @@ public class OHSUDEV
 		//create a gooogle drive object and copy the folder into it.
 		
 		GoogleDriveUploader_Cody gu = new GoogleDriveUploader_Cody(locks,dat);
-		gu.initilizeFolderIDs();
+		
 		
 		
 		
@@ -57,6 +57,7 @@ public class OHSUDEV
 			gu.doUpload(f, IUploadInterface.SUBFOLDER.Configs);
 		} catch (IOException e) {
 			dat.log("error uploading config file");
+			e.printStackTrace();
 		}
 		//set dat google uploader 
 		dat.gu = gu;
