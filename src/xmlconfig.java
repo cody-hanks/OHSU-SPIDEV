@@ -31,15 +31,42 @@ public class xmlconfig
 		try{
 			//Build the XML reader 
 			DocumentBuilder db = dbf.newDocumentBuilder();
-			_dat.log("parsing");
+			//_dat.log("parsing");
 			Document doc = db.parse(_filename);
-			_dat.log("parsed config file");
+			//_dat.log("parsed config file");
 			doc.getDocumentElement().normalize();
+			
+			
+			
+			String log =doc.getElementsByTagName("log").item(0).getTextContent();
+			switch(log)
+			{
+			case "DEBUG":
+				_dat.log = 100;
+				break;
+			case "INFO":
+				_dat.log = 80;
+				break;
+			case "WARNING":
+				_dat.log = 60;
+				break;
+			case "EXCEPTION":
+				_dat.log =40;
+				break;
+				default:
+					_dat.log = 0;
+					
+			}
+			
+			
+			
+			
+			
 			
 			//get list of channel objects 
 			NodeList nList = doc.getElementsByTagName("channel");
 			
-			_dat.log("reading channels");
+			_dat.log_warning("reading channels");
 			
 			
 			//add sample channels to the list 
@@ -56,41 +83,43 @@ public class xmlconfig
 				}
 			}
 			//get auto start settings 
-			_dat.log("channel count: "+_dat.chCount);
+			_dat.log_debug("channel count: "+_dat.chCount);
 			String strAutoStart = doc.getElementsByTagName("autostart").item(0).getTextContent();
 			if(strAutoStart.equals("1"))
 				_dat.autostart = true;
-			_dat.log("AutoStart config: "+strAutoStart);
+			_dat.log_debug("AutoStart config: "+strAutoStart);
 			//get sample frequency
 			String frequency = doc.getElementsByTagName("frequency").item(0).getTextContent();
 			_dat.frequency = Integer.parseInt(frequency);
-			_dat.log("frequency set to: "+_dat.frequency);
+			_dat.log_debug("frequency set to: "+_dat.frequency);
 			
 			String siteid= doc.getElementsByTagName("siteid").item(0).getTextContent();
 			_dat.siteid = siteid;
-			_dat.log("SiteID updated: "+siteid);
+			_dat.log_debug("SiteID updated: "+siteid);
 			
 			String token =doc.getElementsByTagName("token").item(0).getTextContent();
 			_dat.token =token;
-			_dat.log("Token:"+token);
+			_dat.log_debug("Token:"+token);
 			
 			String clientid =doc.getElementsByTagName("clientid").item(0).getTextContent();
 			_dat.clientid =clientid;
-			_dat.log("client id:"+clientid);
+			_dat.log_debug("client id:"+clientid);
 			
 			String secret =doc.getElementsByTagName("secret").item(0).getTextContent();
 			_dat.secret =secret;
-			_dat.log("Secret:"+secret);
+			_dat.log_debug("Secret:"+secret);
 			
 			
 			String parent_folder =doc.getElementsByTagName("parent_folder").item(0).getTextContent();
 			_dat.parent_folder =parent_folder;
-			_dat.log("parentfolder:"+parent_folder);
+			_dat.log_debug("parentfolder:"+parent_folder);
+			
+			
 			
 		}
 		catch(Exception ex)
 		{
-				_dat.log("error reading: "+_filename+" configureation file");
+				_dat.log_exception("error reading: "+_filename+" configureation file");
 		}
 		
 	}

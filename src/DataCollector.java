@@ -63,8 +63,8 @@ public class DataCollector extends Thread{
 		_delay = (1.0/(_chlen * (double)_freq))*1000000000;
 		//System.out.println("Freq");
 		//System.out.println(_delay);
-		_dat.log("Sampleing at frequency: "+_freq);
-		_dat.log("Delay set to: "+_delay+" seconds");
+		_dat.log_info("Sampleing at frequency: "+_freq);
+		_dat.log_info("Delay set to: "+_delay+" seconds");
 	}
 	//thread run 
 	public void run()
@@ -153,7 +153,7 @@ public class DataCollector extends Thread{
 			startTime += _delay;
 			//_dat.setcont(false);
 		}
-		_dat.log("Exited DataCollector");
+		_dat.log_exception("Exited DataCollector");
 		
 	}
 	//this function samples and returns values to a connected tcp network listener 
@@ -177,7 +177,7 @@ public class DataCollector extends Thread{
 			serverSocket = new ServerSocket(_dat.dataportNumber);
 			Socket clientSocket =null;
 			clientSocket = serverSocket.accept();
-			_dat.log("Data Connection accepted");
+			_dat.log_debug("Data Connection accepted");
 			PrintWriter networkwriter = new PrintWriter(clientSocket.getOutputStream(),true);
 			//_dat.lists =new int[2][_dat.listlength][_chlen];
 			//_dat._locks[0].lock();
@@ -219,7 +219,7 @@ public class DataCollector extends Thread{
 			catch(Exception ex)
 			{ex.printStackTrace();}
 		}
-		_dat.log("Exited DataCollector");
+		_dat.log_exception("Exited DataCollector");
 	}
 	
 	

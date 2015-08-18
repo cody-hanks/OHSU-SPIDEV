@@ -56,7 +56,7 @@ public class OHSUDEV
 		try {
 			gu.doUpload(f, IUploadInterface.SUBFOLDER.Configs);
 		} catch (IOException e) {
-			dat.log("error uploading config file");
+			dat.log_warning("error uploading config file");
 			e.printStackTrace();
 		}
 		//set dat google uploader 

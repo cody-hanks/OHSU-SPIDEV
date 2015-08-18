@@ -39,12 +39,12 @@ public class DataWriter extends Thread{
 			{
 				Timer tmr = new Timer();
 				_DW.updatefilename();
-				_dat.log("Updated File Name");
+				_dat.log_warning("Updated File Name");
 				tmr.schedule(new ReminderTask(_runlocklst,_dat,_DW),_dat.tme);
 			}
 			else//else will reset timer and log 
 			{
-				_dat.log("Filename checked");
+				_dat.log_info("Filename checked");
 				Timer tmr = new Timer();
 				tmr.schedule(new ReminderTask(_runlocklst,_dat,_DW),_dat.tme);
 			}
@@ -75,7 +75,7 @@ public class DataWriter extends Thread{
 	{
 		try{
 			_getfilename();//set inital file name 
-			_dat.log("writing to file "+_dat.fileLocation+filename);
+			_dat.log_info("writing to file "+_dat.fileLocation+filename);
 			while(_dat.getcoll())
 			{
 				try{
@@ -153,14 +153,14 @@ public class DataWriter extends Thread{
 					}//end try 
 					catch(Exception ex)
 					{
-						_dat.log("Error writing data to a file");
+						_dat.log_exception("Error writing data to a file");
 						ex.printStackTrace();
 						
 					}
 				}//end while 
 				tmr.cancel();
 				
-				_dat.log("Exit DataWriter");
+				_dat.log_debug("Exit DataWriter");
 				
 			
 			}
@@ -175,7 +175,11 @@ public class DataWriter extends Thread{
 	///return inital file name stored in Datawriter filename
 	private void _getfilename()
 	{
-		filename =""+LocalDateTime.now().getYear()+LocalDateTime.now().getMonth().getValue()+LocalDateTime.now().getDayOfMonth()+LocalDateTime.now().getHour()+LocalDateTime.now().getMinute();
+		filename =""+LocalDateTime.now().getYear()+LocalDateTime.now().getMonth().getValue()+LocalDateTime.now().getDayOfMonth();
+		if(_dat.addhour)
+			{filename=filename+LocalDateTime.now().getHour();}
+		if(_dat.addminute)
+			{filename = filename +LocalDateTime.now().getMinute();}
 		if(LocalDateTime.now().getHour() >12)
 		{filename +="PM";}
 		else 
@@ -184,12 +188,16 @@ public class DataWriter extends Thread{
 	//check for filename changes (will change at hour =1 so 1am and 1pm 
 	public boolean filenamechanged()
 	{
-		String temp = ""+LocalDateTime.now().getYear()+LocalDateTime.now().getMonth().getValue()+LocalDateTime.now().getDayOfMonth()+LocalDateTime.now().getHour()+LocalDateTime.now().getMinute();
+		String temp = ""+LocalDateTime.now().getYear()+LocalDateTime.now().getMonth().getValue()+LocalDateTime.now().getDayOfMonth();
+		if(_dat.addhour)
+		{temp=temp+LocalDateTime.now().getHour();}
+		if(_dat.addminute)
+		{temp = temp+LocalDateTime.now().getMinute();}
 		if(LocalDateTime.now().getHour() >12)
 		{temp +="PM";}
 		else 
 		{temp += "AM";}
-		_dat.log("new file: "+temp+" old: "+filename);
+		_dat.log_debug("new file: "+temp+" old: "+filename);
 		if(temp.equals(filename))
 			return false;
 		else
@@ -203,15 +211,15 @@ public class DataWriter extends Thread{
 			//lock the lists 
 			_dat._locks[0].lock();
 			_dat._locks[1].lock();
-			_dat.log("tried to lock both lists");
+			_dat.log_debug("tried to lock both lists");
 			if(_dat._locks[0].isHeldByCurrentThread() &&_dat._locks[1].isHeldByCurrentThread())
 			{
 				String oldname = filename;
-				_dat.fq.queue.add(_dat.fileLocation+"time"+oldname+".txt");
-				_dat.fq.queue.add(_dat.fileLocation+oldname+".txt");
+				_dat.fq.queue.add("time"+oldname+".txt");
+				_dat.fq.queue.add(oldname+".txt");
 				_getfilename();
-				_dat.log("new filename "+filename);
-				_dat.log("released locks");
+				_dat.log_debug("new filename "+filename);
+				_dat.log_debug("released locks");
 			}
 		}
 		finally{

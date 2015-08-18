@@ -28,13 +28,6 @@ public class RunUploader extends Thread{
 	public void run()
 	{
 		
-		
-		
-		
-		
-	
-		
-		
 		//only run while collecting 
 		while(_dat.getcont())
 		{
@@ -48,17 +41,17 @@ public class RunUploader extends Thread{
 			{
 				String filename = _dat.fq.queue.peek();
 				try{
-					File f = new File(filename);
-					_dat.log("Create Zip:"+filename);
+					File f = new File(_dat.fileLocation+filename);
+					_dat.log_debug("Create Zip:"+filename);
 					
-					String Zipfilename = filename.substring(0,filename.length()-4) + ".zip";
-					_dat.log("Zip filename:"+Zipfilename);
+					String Zipfilename = _dat.upload_dir + filename.substring(0,filename.length()-4) + ".zip";
+					_dat.log_debug("Zip filename:"+Zipfilename);
 					ZipOutputStream outzip = new ZipOutputStream(new FileOutputStream(Zipfilename));
 					String[] basefilename = filename.split("/");
 					ZipEntry zipent = new ZipEntry(basefilename[basefilename.length-1]);
 					outzip.putNextEntry(zipent);
 					InputStream IS = new FileInputStream(f);
-					_dat.log("write zip file");
+					_dat.log_debug("write zip file");
 					int len; byte[] buf = new byte[8192];
 					while((len = IS.read(buf))>0)
 					{
@@ -68,14 +61,14 @@ public class RunUploader extends Thread{
 					outzip.close();
 					IS.close();
 					
-					_dat.log("Close zip file and delete file on drive");
+					_dat.log_debug("Close zip file and delete file on drive");
 					File zipfile = new File(Zipfilename);
-					_dat.log("Try uploading file "+Zipfilename);
+					_dat.log_debug("Try uploading file "+Zipfilename);
 					_dat.gu.doUpload(zipfile, IUploadInterface.SUBFOLDER.Continious);
 					//_dat.gu.doUpload(f, IUploadInterface.SUBFOLDER.Continious);
-					_dat.log("File was uploaded: "+Zipfilename);
+					_dat.log_warning("File was uploaded: "+Zipfilename);
 					_dat.fq.next();
-					_dat.log("filename expired from queue "+Zipfilename);
+					_dat.log_debug("filename expired from queue "+Zipfilename);
 					_dat.fq.savetodisk(_dat.qeuefile);
 					Scavenge_stale_files(f);
 					Scavenge_stale_files(zipfile);
@@ -84,7 +77,7 @@ public class RunUploader extends Thread{
 				}
 				catch(Exception ex)
 				{
-					_dat.log("Error uploading "+filename);
+					_dat.log_exception("Error uploading "+filename);
 				}
 			}//end if 
 		}//end while 

@@ -31,14 +31,14 @@ public class Server extends Thread{
 	//Threaded run server to recive commands this is the command protocol for 
 	public void run()
 	{
-		_dat.log("starting server");
+		_dat.log_warning("starting server");
 		ServerSocket serverSocket = null;
 		try{
 			while(_dat.getcont()){
 			serverSocket = new ServerSocket(_dat.portNumber);
 			Socket clientSocket =null;
 			clientSocket = serverSocket.accept();
-			_dat.log("Connection accepted");
+			_dat.log_info("Connection accepted");
 			PrintWriter out = new PrintWriter(clientSocket.getOutputStream(),true);
 			BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 			String inputline;
@@ -83,7 +83,7 @@ public class Server extends Thread{
 			clientSocket.close();
 			serverSocket.close();
 		  }
-		  _dat.log("Server Exit");
+		  _dat.log_warning("Server Exit");
 		}//end try 
 		catch(Exception ex)
 		{
@@ -110,7 +110,7 @@ public class Server extends Thread{
 		new Thread(WriterThread).start();
 		}
 		catch(Exception ex)
-		{_dat.log("error starting collection");}
+		{_dat.log_exception("error starting collection");}
 	}
 	public void startnetcollection()
 	{
@@ -122,7 +122,7 @@ public class Server extends Thread{
 		new Thread(CollectorThread).start();
 		}
 		catch(Exception ex)
-		{_dat.log("error starting net collection ");}
+		{_dat.log_exception("error starting net collection ");}
 	}
 		
 	public void endcollection()
