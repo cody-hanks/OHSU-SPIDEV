@@ -114,7 +114,19 @@ public class xmlconfig
 			_dat.parent_folder =parent_folder;
 			_dat.log_debug("parentfolder:"+parent_folder);
 			
+			String include_hour =doc.getElementsByTagName("add_hour").item(0).getTextContent();
+			if(Integer.parseInt(include_hour)>0)
+				_dat.addhour =true;
+			else
+				_dat.addhour =false;
+			_dat.log_debug("Add hour "+ include_hour );
 			
+			String include_min =doc.getElementsByTagName("add_min").item(0).getTextContent();
+			if(Integer.parseInt(include_min)>0)
+				_dat.addminute =true;
+			else
+				_dat.addminute= false;
+			_dat.log_debug("Include min"+include_min);
 			
 		}
 		catch(Exception ex)
