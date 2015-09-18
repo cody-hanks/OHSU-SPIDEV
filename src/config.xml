@@ -48,7 +48,16 @@
 <channel>
 <number>15</number>
 </channel>
+<log>DEBUG</log>
 <autostart>0</autostart>
 <frequency>250</frequency>
+<siteid>TestSite01</siteid>
+<token>1/ZtFQJxUo9GrtGTW-Se2T1iDEjZc0Nj4bTbG3HEXyQ3E</token>
+<clientid>240795554120-i4baqa7giopgfh8imann3ikeal1tcall.apps.googleusercontent.com</clientid>
+<secret>GmVpPttxeVoQFKTbwLw2nCeX</secret>
+<parent_folder>SleepStudy</parent_folder>
+<data_folder>/home/ohsu/</data_folder>
+<add_hour>0</add_hour>
+<add_min>0</add_min>
 
 </settings>
