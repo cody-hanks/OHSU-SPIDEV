@@ -21,6 +21,8 @@ public class DataCollector extends Thread{
 		public void setupspi(int fd);
 		public int xfer(int fd, int cmd);
 		public void closespi(int fd);
+		public int initi2c();
+		public int readmpu(int fd, char address);
 	};
 	// data used by the collector
 	private cspi CSPI;
@@ -116,9 +118,9 @@ public class DataCollector extends Thread{
 			//					+((index+2)%_chlen));
 			//if channel is >7 IE 8 then set the gpio for chip 2 
 			if(_chlist[index] >7)
-				_dat.CSPI.setgpio(_dat.fd,0);
-			else 
 				_dat.CSPI.setgpio(_dat.fd,1);
+			else 
+				_dat.CSPI.setgpio(_dat.fd,0);
 			//increase the index for next channel 	
 			index++;
 			//check for last channel in list and reset to first channel increase sample row
@@ -166,6 +168,7 @@ public class DataCollector extends Thread{
 			CSPI = (cspi)Native.loadLibrary("cspi",cspi.class);
 			//System.out.println(CSPI.test());//SPI
 			int fd = CSPI.openspi();
+			int i2cfd = CSPI.initi2c();
 			int high =241;//ch0 
 			int low = 36;//initial 
 			int value = (high<<8)|low;
@@ -181,8 +184,16 @@ public class DataCollector extends Thread{
 			PrintWriter networkwriter = new PrintWriter(clientSocket.getOutputStream(),true);
 			//_dat.lists =new int[2][_dat.listlength][_chlen];
 			//_dat._locks[0].lock();
+			int lst;
+			for(int i =0; i<250;i++){
+			lst = CSPI.readmpu(i2cfd,(char)0x3B);
+			System.out.print(lst);
+			
+			}
+			System.out.print("\r\n");
 			while(_dat.getcoll())
 			{
+				
 				//System.out.println(CSPI.xfer(fd,value));
 				//_dat.lists[listindex][sampleindex][index] = CSPI.xfer(fd,value);
 				networkwriter.println(_chlist[(index+2)%_chlen] +","+CSPI.xfer(fd,value));
@@ -190,9 +201,9 @@ public class DataCollector extends Thread{
 				//System.out.println("filling index: "+index+"sent ch :"+	_chlist[(index+2)%_chlen] +" chindex:"
 				//					+((index+2)%_chlen));
 				if(_chlist[index] >7)
-					_dat.CSPI.setgpio(_dat.fd,0);
-				else 
 					_dat.CSPI.setgpio(_dat.fd,1);
+				else 
+					_dat.CSPI.setgpio(_dat.fd,0);
 					
 				index++;
 				if(index >= (_chlen))
